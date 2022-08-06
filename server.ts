@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import userRoute from "./routes/userRoute";
 import messageRoute from "./routes/messageRoute"
+import groupRoute from "./routes/groupRoute"
 require("dotenv").config()
 
 const uri =
@@ -12,7 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded())
 
 app.use(userRoute);
-app.use(messageRoute)
+app.use(messageRoute);
+app.use(groupRoute);
 
 
 const port = process.env.PORT || 5000;

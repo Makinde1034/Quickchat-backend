@@ -17,14 +17,14 @@ export const createUser = async (req: Request, res: Response) => {
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const newUser = await User.create({
 			email: email,
-			password: password,
+			password: hashedPassword,
 			userName: userName,
 		});
 
 		const accessToken = jwt.sign(
 			{ user_id: newUser._id },
 			process.env.ACCESS_TOKEN as string,
-			{ expiresIn: "24hr" }
+			{ expiresIn: "2 days" }
 		);
 
 		res.status(200).json({
@@ -36,3 +36,26 @@ export const createUser = async (req: Request, res: Response) => {
 		console.log(err)
 	}
 };
+
+export const login = async (req: Request, res: Response) =>{
+    const { email,password } = req.body
+    const user = await User.findOne({email : email })
+
+    if(!user){
+        return res.status(400).json({message : "No user with this email"})
+    }
+
+    
+
+    if(user && ( await bcrypt.compare(password,user.password)) ){
+        const token = jwt.sign({user_id : user._id},process.env.ACCESS_TOKEN as string,{expiresIn : "24h"})
+    
+        return res.status(200).json({
+            token,
+            user
+        })
+    }
+
+    res.status(400).json({msg:"Password not correct"})
+}
+
